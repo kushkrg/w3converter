@@ -1,0 +1,19 @@
+{
+  "name": "janitor",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "5",
+    "ioredis": "^5.6.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.5.4",
+    "@types/node": "^20.0.0",
+    "prisma": "5"
+  }
+}

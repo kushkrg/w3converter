@@ -1,0 +1,38 @@
+FROM node:20-bookworm-slim AS base
+
+# Install system PDF engines
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ghostscript \
+  qpdf \
+  poppler-utils \
+  libreoffice \
+  libreoffice-writer \
+  libreoffice-impress \
+  libreoffice-calc \
+  fonts-liberation \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g pnpm@9
+
+FROM base AS deps
+WORKDIR /app
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* ./
+COPY apps/worker/package.json ./apps/worker/
+COPY packages/core/package.json ./packages/core/
+RUN pnpm install --frozen-lockfile
+
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/worker/node_modules ./apps/worker/node_modules
+COPY apps/worker ./apps/worker
+COPY packages/core ./packages/core
+COPY apps/web/prisma ./apps/web/prisma
+
+RUN addgroup --system --gid 1001 worker && adduser --system --uid 1001 worker
+RUN mkdir -p /tmp/pdftools/uploads /tmp/pdftools/outputs && chown -R worker:worker /tmp/pdftools
+USER worker
+
+CMD ["node", "--import", "tsx/esm", "apps/worker/src/index.ts"]
