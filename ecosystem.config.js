@@ -8,13 +8,11 @@ try {
   if (fs.existsSync(envPath)) {
     const lines = fs.readFileSync(envPath, 'utf8').split('\n');
     for (const line of lines) {
-      // Ignore comments and empty lines
       if (!line.trim() || line.trim().startsWith('#')) continue;
       const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
       if (match) {
         const key = match[1];
         let val = match[2] || '';
-        // Strip surrounding quotes
         if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
         if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
         env[key] = val;
@@ -39,9 +37,9 @@ module.exports = {
     },
     {
       name: "w3converter-worker",
-      script: "node_modules/tsx/dist/cli.js",
-      args: "src/index.ts",
-      cwd: "./apps/worker",
+      script: "pnpm",
+      args: "run worker",
+      cwd: "./",
       env: {
         ...env,
         NODE_ENV: "production",
@@ -51,9 +49,9 @@ module.exports = {
     },
     {
       name: "w3converter-janitor",
-      script: "node_modules/tsx/dist/cli.js",
-      args: "src/index.ts",
-      cwd: "./apps/janitor",
+      script: "pnpm",
+      args: "run janitor",
+      cwd: "./",
       env: {
         ...env,
         NODE_ENV: "production",
