@@ -15,6 +15,7 @@ import { UnlockControls } from "./controls/unlock-controls";
 import { WatermarkControls } from "./controls/watermark-controls";
 import { InvoiceControls } from "./controls/invoice-controls";
 import { SignatureControls } from "./controls/signature-controls";
+import { OrganizeControls } from "./controls/organize-controls";
 
 const MULTI_INPUT_TOOLS = new Set(["merge-pdf", "jpg-to-pdf", "png-to-pdf", "bmp-to-pdf", "tiff-to-pdf"]);
 
@@ -136,6 +137,12 @@ export function ToolForm({ toolId }: ToolFormProps) {
       )}
       {toolId === "split-pdf" && (
         <SplitControls onChange={(ranges) => setParams({ ranges })} />
+      )}
+      {toolId === "organize-pdf" && files[0] && (
+        <OrganizeControls
+          file={files[0]}
+          onChange={(order) => setParams({ order })}
+        />
       )}
       {toolId === "protect-pdf" && (
         <ProtectControls onChange={(p) => setParams(p as unknown as Record<string, unknown>)} />
