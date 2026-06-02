@@ -4,11 +4,16 @@ import { getSettings } from "@/lib/settings";
 import { prisma } from "@/lib/db";
 
 export async function Footer() {
-  const s = await getSettings(["site.name", "footer.tagline", "footer.filesDeletedNote", "site.logoUrl"]);
+  const s = await getSettings(["site.name", "footer.tagline", "footer.filesDeletedNote", "site.logoUrl", "footer.copyright"]);
   const siteName = s["site.name"] || "w3converter";
   const tagline = s["footer.tagline"] || "Free online PDF tools — no registration, no software needed.";
   const filesDeletedNote = s["footer.filesDeletedNote"] || "Uploaded files are automatically deleted after 1 hour";
   const logoUrl = s["site.logoUrl"] || "";
+
+  // Parse copyright dynamic text
+  const currentYear = new Date().getFullYear().toString();
+  const rawCopyright = s["footer.copyright"] || `© {year} ${siteName}. All rights reserved.`;
+  const copyrightText = rawCopyright.replace("{year}", currentYear);
 
   // Fetch active footer links ordered by priority
   let footerItems: Awaited<ReturnType<typeof prisma.menuItem.findMany>> = [];
@@ -120,7 +125,7 @@ export async function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <span>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</span>
+          <span>{copyrightText}</span>
           <span>26+ free PDF tools · No registration · No software needed</span>
         </div>
       </div>

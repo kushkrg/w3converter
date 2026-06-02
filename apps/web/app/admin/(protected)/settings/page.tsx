@@ -96,9 +96,14 @@ export default async function SettingsPage() {
           <Field label="Tagline">
             <input name="footer.tagline" type="text" defaultValue={s["footer.tagline"]} placeholder={SETTING_DEFAULTS["footer.tagline"]} className={INPUT} />
           </Field>
-          <Field label="Files Deleted Note">
-            <input name="footer.filesDeletedNote" type="text" defaultValue={s["footer.filesDeletedNote"]} placeholder={SETTING_DEFAULTS["footer.filesDeletedNote"]} className={INPUT} />
-          </Field>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Field label="Files Deleted Note">
+              <input name="footer.filesDeletedNote" type="text" defaultValue={s["footer.filesDeletedNote"]} placeholder={SETTING_DEFAULTS["footer.filesDeletedNote"]} className={INPUT} />
+            </Field>
+            <Field label="Copyright Line" hint="Use {year} as a dynamic placeholder for the current year.">
+              <input name="footer.copyright" type="text" defaultValue={s["footer.copyright"]} placeholder={SETTING_DEFAULTS["footer.copyright"]} className={INPUT} />
+            </Field>
+          </div>
         </Section>
 
         {/* Homepage Hero Content */}

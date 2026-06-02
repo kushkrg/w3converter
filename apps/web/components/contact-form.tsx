@@ -18,7 +18,11 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export function ContactForm() {
+interface ContactFormProps {
+  recaptchaSiteKey?: string;
+}
+
+export function ContactForm({ recaptchaSiteKey }: ContactFormProps) {
   const [sent, setSent] = useState(false);
   const {
     register,
@@ -28,15 +32,26 @@ export function ContactForm() {
 
   async function onSubmit(data: FormData) {
     try {
+      let recaptchaToken = "";
+      if (recaptchaSiteKey && (window as any).grecaptcha) {
+        recaptchaToken = await (window as any).grecaptcha.execute(recaptchaSiteKey, {
+          action: "contact",
+        });
+      }
+
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, recaptchaToken }),
       });
-      if (!res.ok) throw new Error("Failed");
+      
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed");
+      }
       setSent(true);
-    } catch {
-      toast.error("Failed to send message. Please try again.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send message. Please try again.");
     }
   }
 

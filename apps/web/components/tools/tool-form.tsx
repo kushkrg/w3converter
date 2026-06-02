@@ -40,9 +40,10 @@ const PDF_INPUT_TOOLS = new Set([
 
 interface ToolFormProps {
   toolId: ToolId;
+  recaptchaSiteKey?: string;
 }
 
-export function ToolForm({ toolId }: ToolFormProps) {
+export function ToolForm({ toolId, recaptchaSiteKey }: ToolFormProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [params, setParams] = useState<Record<string, unknown>>(
     toolId === "watermark-pdf" ? { type: "text" } : {}
@@ -80,9 +81,17 @@ export function ToolForm({ toolId }: ToolFormProps) {
 
     setLoading(true);
     try {
+      let recaptchaToken = "";
+      if (recaptchaSiteKey && (window as any).grecaptcha) {
+        recaptchaToken = await (window as any).grecaptcha.execute(recaptchaSiteKey, {
+          action: `submit_${toolId.replace(/-/g, "_")}`,
+        });
+      }
+
       const form = new FormData();
       form.append("tool", toolId);
       form.append("params", JSON.stringify(params));
+      form.append("recaptchaToken", recaptchaToken);
       files.forEach((f) => form.append("files", f));
       if (logoFile) form.append("files", logoFile);
 

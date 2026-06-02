@@ -19,9 +19,10 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const s = await getSettings(["custom.css", "custom.js"]);
+  const s = await getSettings(["custom.css", "custom.js", "recaptcha.enabled", "recaptcha.siteKey"]);
   const customCss = s["custom.css"];
   const customJs = s["custom.js"];
+  const isRecaptcha = s["recaptcha.enabled"] === "true" && s["recaptcha.siteKey"];
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
@@ -32,6 +33,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {children}
         <Toaster />
         <AdSenseScript />
+        {isRecaptcha && (
+          <script
+            src={`https://www.google.com/recaptcha/api.js?render=${s["recaptcha.siteKey"]}`}
+            async
+            defer
+          />
+        )}
         {customJs && (
           <script id="custom-js" dangerouslySetInnerHTML={{ __html: customJs }} />
         )}

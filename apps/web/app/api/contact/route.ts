@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getSetting } from "@/lib/settings";
 import { sendContactEmail } from "@/lib/mail";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 const ContactSchema = z.object({
   name: z.string().min(2).max(100),
@@ -42,6 +43,13 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, email, message } = parsed.data;
+    const recaptchaToken = (body.recaptchaToken as string) || "";
+
+    // Verify reCAPTCHA token
+    const isHuman = await verifyRecaptcha(recaptchaToken);
+    if (!isHuman) {
+      return NextResponse.json({ error: "reCAPTCHA verification failed. Please try again." }, { status: 400 });
+    }
 
     // Resolve client IP
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || 

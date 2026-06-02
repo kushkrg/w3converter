@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { pdfQueue } from "@/lib/queue";
 import { rateLimit } from "@/lib/rate-limit";
 import { JOB_TTL_MS, bundleFiles } from "@pdf-tools/core";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 const CreateJobSchema = z.object({
   tool: z.string().min(1),
@@ -39,8 +40,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: unknown;
+  let body: any;
   let files: File[] = [];
+  let recaptchaToken = "";
 
   const contentType = request.headers.get("content-type") ?? "";
 
@@ -48,13 +50,24 @@ export async function POST(request: NextRequest) {
     const form = await request.formData();
     const toolVal = form.get("tool");
     const paramsVal = form.get("params");
+    const recaptchaVal = form.get("recaptchaToken");
+    
     body = {
       tool: typeof toolVal === "string" ? toolVal : "",
       params: paramsVal && typeof paramsVal === "string" ? JSON.parse(paramsVal) : {},
     };
     files = form.getAll("files").filter((f): f is File => f instanceof File);
+    recaptchaToken = typeof recaptchaVal === "string" ? recaptchaVal : "";
   } else {
-    body = await request.json();
+    const jsonBody = await request.json();
+    body = jsonBody;
+    recaptchaToken = (jsonBody && typeof jsonBody === "object" && "recaptchaToken" in jsonBody) ? (jsonBody.recaptchaToken as string) : "";
+  }
+
+  // Verify reCAPTCHA token
+  const isHuman = await verifyRecaptcha(recaptchaToken);
+  if (!isHuman) {
+    return NextResponse.json({ error: "reCAPTCHA verification failed. Please try again." }, { status: 400 });
   }
 
   const parsed = CreateJobSchema.safeParse(body);

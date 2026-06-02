@@ -11,6 +11,7 @@ export const SETTING_DEFAULTS: Record<string, string> = {
   "maintenance.message":        "We are currently under maintenance. Please check back soon.",
   "footer.tagline":             "Fast, private, and free PDF tools — no registration required.",
   "footer.filesDeletedNote":    "All files are automatically deleted after 1 hour.",
+  "footer.copyright":           "© {year} w3converter. All rights reserved.",
   "home.heroTitle":             "Every tool you need to work with PDFs in one place",
   "home.heroDesc":              "Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use! Merge, split, compress, convert, rotate, unlock and protect PDFs with just a few clicks.",
   "site.logoUrl":               "",

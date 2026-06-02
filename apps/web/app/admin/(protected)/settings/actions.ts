@@ -10,7 +10,7 @@ const SETTINGS_KEYS = [
   "site.name", "site.tagline", "site.contactEmail",
   "upload.maxSizeMB", "job.ttlHours",
   "maintenance.enabled", "maintenance.message",
-  "footer.tagline", "footer.filesDeletedNote",
+  "footer.tagline", "footer.filesDeletedNote", "footer.copyright",
   "home.heroTitle", "home.heroDesc",
   "site.logoUrl",
 ];

@@ -17,6 +17,7 @@ import { prisma } from "@/lib/db";
 import { PageTracker } from "@/components/admin/page-tracker";
 import { DEFAULT_SEO } from "@/lib/default-seo";
 import { AdSlot } from "@/components/ads/ad-slot";
+import { getSettings } from "@/lib/settings";
 
 export function generateStaticParams() {
   return TOOLS.map((tool) => ({ toolId: tool.id }));
@@ -133,12 +134,15 @@ export default async function ToolPage({
   }
 
   let cfgPage: Awaited<ReturnType<typeof prisma.toolConfig.findUnique>> = null;
+  let recaptchaSettings: Record<string, string> = {};
   try {
     cfgPage = await prisma.toolConfig.findUnique({ where: { toolId } });
+    recaptchaSettings = await getSettings(["recaptcha.enabled", "recaptcha.siteKey"]);
   } catch {
     // Table may not exist during first deploy build
   }
   const cfg = cfgPage;
+  const recaptchaSiteKey = recaptchaSettings["recaptcha.enabled"] === "true" ? recaptchaSettings["recaptcha.siteKey"] : "";
   if (cfg && !cfg.enabled) notFound();
 
   const allData = messages.tools as Record<string, { title: string; desc: string }>;
@@ -179,7 +183,7 @@ export default async function ToolPage({
           <AdSlot slotKey="ads.toolPageTop" adFormat="horizontal" className="mb-6" />
 
           <div className="rounded-2xl border bg-card shadow-sm p-7">
-            <ToolForm toolId={tool.id as ToolId} />
+            <ToolForm toolId={tool.id as ToolId} recaptchaSiteKey={recaptchaSiteKey} />
           </div>
 
           <section className="mt-12 rounded-2xl border bg-muted/20 p-7">

@@ -3,12 +3,17 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ContactForm } from "@/components/contact-form";
 
+import { getSettings } from "@/lib/settings";
+
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with the w3converter team.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const s = await getSettings(["recaptcha.enabled", "recaptcha.siteKey"]);
+  const recaptchaSiteKey = s["recaptcha.enabled"] === "true" ? s["recaptcha.siteKey"] : "";
+
   return (
     <>
       <Header />
@@ -18,7 +23,7 @@ export default function ContactPage() {
           <p className="text-muted-foreground mb-8">
             Have a question, bug report, or feature request? We&apos;d love to hear from you.
           </p>
-          <ContactForm />
+          <ContactForm recaptchaSiteKey={recaptchaSiteKey} />
         </div>
       </main>
       <Footer />
