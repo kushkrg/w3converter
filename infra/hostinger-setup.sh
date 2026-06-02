@@ -155,6 +155,11 @@ pm2 start ecosystem.config.js
 pm2 save
 pm2 startup || true
 
+# Restore ownership of the directory to the original non-root user who invoked sudo
+if [ -n "$SUDO_USER" ]; then
+  chown -R $SUDO_USER:$SUDO_USER .
+fi
+
 echo -e "\n${GREEN}======================================================================${NC}"
 echo -e "${GREEN}🎉 CONGRATULATIONS! Automated VPS Setup Completed Successfully! 🎉${NC}"
 echo -e "${GREEN}======================================================================${NC}"
