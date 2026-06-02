@@ -559,7 +559,7 @@ interface InvoiceData {
 }
 
 export async function generateInvoice(outputDir: string, raw: Record<string, unknown>): Promise<string> {
-  const data = raw as InvoiceData;
+  const data = raw as unknown as InvoiceData;
   const items: InvoiceLineItem[] = Array.isArray(data.items) ? data.items : [];
 
   const pdfDoc = await PDFDocument.create();

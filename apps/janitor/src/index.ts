@@ -34,7 +34,14 @@ async function sweep() {
 
   await prisma.job.updateMany({
     where: { id: { in: ids } },
-    data: { status: "expired", inputPath: "", outputPath: null },
+    data: {
+      status: "expired",
+      inputPath: "",
+      outputPath: null,
+      inputData: null,
+      outputData: null,
+      outputName: null,
+    },
   });
 
   console.log(`[janitor] Done. Marked ${ids.length} jobs as expired.`);

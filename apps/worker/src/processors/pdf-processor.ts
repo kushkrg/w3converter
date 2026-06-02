@@ -1,7 +1,9 @@
 import { Job } from "bullmq";
 import { PrismaClient } from "@prisma/client";
 import path from "path";
+import fs from "fs/promises";
 import type { JobPayload } from "../types";
+import { unbundleFiles } from "@pdf-tools/core";
 import {
   mergePdfs, splitPdf, rotatePdf, deletePages, extractPages,
   organizePdf, repairPdf, compressPdf, compressPdfToTargetSize,
@@ -13,17 +15,48 @@ import { officeToPdf, pdfToOffice, txtToPdf, pdfToTxt, pdfToZip } from "../engin
 
 const prisma = new PrismaClient();
 
+const UPLOAD_DIR = process.env["UPLOAD_DIR"] ?? "/tmp/pdftools/uploads";
+const OUTPUT_DIR = process.env["OUTPUT_DIR"] ?? "/tmp/pdftools/outputs";
+
 export async function processPdfJob(job: Job<JobPayload>) {
-  const { jobId, tool, inputPath, outputDir, params } = job.data;
+  const { jobId, tool, params } = job.data;
 
   await prisma.job.update({ where: { id: jobId }, data: { status: "processing" } });
 
+  // Create local directories for this job
+  const uploadPath = path.join(UPLOAD_DIR, jobId);
+  const outputDir = path.join(OUTPUT_DIR, jobId);
+  await fs.mkdir(uploadPath, { recursive: true });
+  await fs.mkdir(outputDir, { recursive: true });
+
+  // Read input file data from the database
+  const dbJob = await prisma.job.findUnique({
+    where: { id: jobId },
+    select: { inputData: true },
+  });
+
+  const savedPaths: string[] = [];
+  if (dbJob?.inputData) {
+    const files = unbundleFiles(Buffer.from(dbJob.inputData));
+    for (const file of files) {
+      const dest = path.join(uploadPath, file.name);
+      await file.buffer.length > 0 && fs.writeFile(dest, file.buffer);
+      savedPaths.push(dest);
+    }
+    // Clear inputData from DB to free space now that files are on disk
+    await prisma.job.update({
+      where: { id: jobId },
+      data: { inputData: null },
+    });
+  }
+
+  const inputPath = savedPaths[0] ?? "";
   let outputPath: string;
 
   try {
     switch (tool) {
       case "merge-pdf": {
-        const paths = (params["inputPaths"] as string[]) ?? [inputPath];
+        const paths = savedPaths.length > 0 ? savedPaths : [inputPath];
         outputPath = await mergePdfs(paths, outputDir);
         break;
       }
@@ -77,7 +110,7 @@ export async function processPdfJob(job: Job<JobPayload>) {
       case "png-to-pdf":
       case "bmp-to-pdf":
       case "tiff-to-pdf": {
-        const paths = (params["inputPaths"] as string[]) ?? [inputPath];
+        const paths = savedPaths.length > 0 ? savedPaths : [inputPath];
         outputPath = await imagesToPdf(paths, outputDir);
         break;
       }
@@ -134,24 +167,25 @@ export async function processPdfJob(job: Job<JobPayload>) {
         break;
       }
       case "watermark-pdf": {
-        const allPaths = (params["inputPaths"] as string[]) ?? [inputPath];
-        const logoPath = allPaths[1]; // second file is the logo when type === "logo"
-        outputPath = await addWatermark(inputPath, outputDir, {
+        const logoPath = savedPaths[1]; // second file is the logo when type === "logo"
+        const watermarkOpts: any = {
           type:       (params["type"]      as "text" | "logo" | "diagonal") ?? "text",
           text:       (params["text"]      as string)  ?? "CONFIDENTIAL",
           fontSize:   (params["fontSize"]  as number)  ?? 48,
           color:      (params["color"]     as string)  ?? "#9ca3af",
           opacity:    (params["opacity"]   as number)  ?? 0.3,
           placement:  (params["placement"] as "center" | "tile") ?? "center",
-          logoPath,
           logoSizePct:(params["logoSizePct"] as number) ?? 30,
           repeat:     (params["repeat"]    as boolean) ?? true,
-        });
+        };
+        if (logoPath) {
+          watermarkOpts.logoPath = logoPath;
+        }
+        outputPath = await addWatermark(inputPath, outputDir, watermarkOpts);
         break;
       }
       case "signature-pdf": {
-        const allPaths = (params["inputPaths"] as string[]) ?? [inputPath];
-        const signaturePath = allPaths[1];
+        const signaturePath = savedPaths[1];
         if (!signaturePath) throw new Error("No signature image provided.");
         outputPath = await addSignature(inputPath, outputDir, signaturePath, {
           page:        (params["page"]        as number)  ?? 1,
@@ -175,24 +209,69 @@ export async function processPdfJob(job: Job<JobPayload>) {
         throw new Error(`Unknown tool: ${tool}`);
     }
 
-    const stat = await import("fs").then((m) => {
-      try { return m.statSync(outputPath); } catch { return null; }
-    });
+    // Read all output files and store in the database so the download route
+    // (on Vercel) can serve them without filesystem access.
+    const outputFiles = await fs.readdir(outputDir);
+    let outputData: Buffer;
+    let outputName: string;
+
+    if (outputFiles.length === 1 && outputFiles[0]) {
+      // Single output file — store directly
+      outputData = await fs.readFile(path.join(outputDir, outputFiles[0]));
+      outputName = `w3converter-${tool}-${outputFiles[0]}`;
+    } else if (outputFiles.length > 1) {
+      // Multiple output files — zip them
+      const archiver = (await import("archiver")).default;
+      const { Writable } = await import("stream");
+      const chunks: Buffer[] = [];
+      const writable = new Writable({
+        write(chunk, _encoding, callback) {
+          chunks.push(Buffer.from(chunk));
+          callback();
+        },
+      });
+      const archive = archiver("zip", { zlib: { level: 6 } });
+      archive.pipe(writable);
+      for (const f of outputFiles) {
+        archive.file(path.join(outputDir, f), { name: f });
+      }
+      await archive.finalize();
+      await new Promise<void>((resolve) => writable.on("finish", resolve));
+      outputData = Buffer.concat(chunks);
+      outputName = `w3converter-${tool}-${jobId}.zip`;
+    } else {
+      // Fallback: read from outputPath directly
+      outputData = await fs.readFile(outputPath);
+      outputName = `w3converter-${tool}-${path.basename(outputPath)}`;
+    }
 
     await prisma.job.update({
       where: { id: jobId },
       data: {
         status: "ready",
         outputPath,
-        sizeOut: BigInt(stat?.size ?? 0),
+        sizeOut: BigInt(outputData.length),
+        outputData,
+        outputName,
       },
     });
+
+    // Clean up local files
+    await Promise.allSettled([
+      fs.rm(uploadPath, { recursive: true, force: true }),
+      fs.rm(outputDir, { recursive: true, force: true }),
+    ]);
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
     await prisma.job.update({
       where: { id: jobId },
       data: { status: "failed", error },
     });
+    // Clean up local files on failure too
+    await Promise.allSettled([
+      fs.rm(uploadPath, { recursive: true, force: true }),
+      fs.rm(outputDir, { recursive: true, force: true }),
+    ]);
     throw err;
   }
 }

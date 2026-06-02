@@ -1,0 +1,64 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "tools": "Todas las herramientas",
+    "about": "Acerca de",
+    "privacy": "Privacidad",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "title": "Herramientas PDF todo en uno",
+    "subtitle": "Combina, divide, comprime, convierte y protege PDF — herramientas gratuitas sin registro.",
+    "cta": "Ver todas las herramientas"
+  },
+  "categories": {
+    "organize": "Organización de PDF",
+    "optimize": "Optimización",
+    "convert": "Conversiones",
+    "security": "Seguridad"
+  },
+  "tools": {
+    "merge-pdf": { "title": "Unir PDF", "desc": "Combina varios archivos PDF en uno solo." },
+    "split-pdf": { "title": "Dividir PDF", "desc": "Divide un PDF en varios archivos por rango de páginas." },
+    "rotate-pdf": { "title": "Rotar PDF", "desc": "Rota páginas en un PDF 90, 180 o 270 grados." },
+    "delete-pages": { "title": "Eliminar páginas", "desc": "Elimina páginas seleccionadas de un PDF." },
+    "organize-pdf": { "title": "Organizar PDF", "desc": "Reordena páginas con arrastrar y soltar." },
+    "extract-pages": { "title": "Extraer páginas", "desc": "Extrae páginas seleccionadas a un nuevo PDF." },
+    "repair-pdf": { "title": "Reparar PDF", "desc": "Recupera y repara un PDF dañado." },
+    "compress-pdf": { "title": "Comprimir PDF", "desc": "Reduce el tamaño del PDF manteniendo la calidad." },
+    "grayscale-pdf": { "title": "PDF en escala de grises", "desc": "Convierte un PDF en color a blanco y negro." },
+    "jpg-to-pdf": { "title": "JPG a PDF", "desc": "Convierte imágenes JPG a PDF." },
+    "png-to-pdf": { "title": "PNG a PDF", "desc": "Convierte imágenes PNG a PDF." },
+    "bmp-to-pdf": { "title": "BMP a PDF", "desc": "Convierte imágenes BMP a PDF." },
+    "tiff-to-pdf": { "title": "TIFF a PDF", "desc": "Convierte imágenes TIFF a PDF." },
+    "pdf-to-jpg": { "title": "PDF a JPG", "desc": "Convierte páginas PDF a imágenes JPG." },
+    "pdf-to-png": { "title": "PDF a PNG", "desc": "Convierte páginas PDF a imágenes PNG." },
+    "pdf-to-bmp": { "title": "PDF a BMP", "desc": "Convierte páginas PDF a imágenes BMP." },
+    "pdf-to-tiff": { "title": "PDF a TIFF", "desc": "Convierte páginas PDF a imágenes TIFF." },
+    "word-to-pdf": { "title": "Word a PDF", "desc": "Convierte documentos Word a PDF." },
+    "pdf-to-word": { "title": "PDF a Word", "desc": "Convierte PDF a documentos Word editables." },
+    "ppt-to-pdf": { "title": "PPT a PDF", "desc": "Convierte presentaciones PowerPoint a PDF." },
+    "pdf-to-ppt": { "title": "PDF a PPT", "desc": "Convierte PDF a presentaciones PowerPoint." },
+    "excel-to-pdf": { "title": "Excel a PDF", "desc": "Convierte hojas de cálculo Excel a PDF." },
+    "txt-to-pdf": { "title": "TXT a PDF", "desc": "Convierte archivos de texto a PDF." },
+    "pdf-to-txt": { "title": "PDF a TXT", "desc": "Extrae texto de un PDF." },
+    "pdf-to-zip": { "title": "PDF a ZIP", "desc": "Empaqueta archivos de salida en un ZIP." },
+    "protect-pdf": { "title": "Proteger PDF", "desc": "Añade contraseña a tu PDF." },
+    "unlock-pdf": { "title": "Desbloquear PDF", "desc": "Elimina la contraseña de un PDF." }
+  },
+  "upload": {
+    "dropzone": "Suelta tus archivos aquí o haz clic para explorar",
+    "maxSize": "Tamaño máximo: {size}MB",
+    "processing": "Procesando...",
+    "download": "Descargar",
+    "uploadAnother": "Procesar otro archivo",
+    "error": "Algo salió mal. Por favor intenta de nuevo."
+  },
+  "footer": {
+    "tagline": "Herramientas PDF rápidas, privadas y gratuitas — sin registro.",
+    "filesDeleted": "Todos los archivos se eliminan automáticamente en 1 hora.",
+    "legal": "Legal",
+    "privacy": "Política de privacidad",
+    "terms": "Términos de servicio"
+  }
+}

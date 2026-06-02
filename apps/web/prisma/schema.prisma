@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum JobStatus {
+  queued
+  processing
+  ready
+  failed
+  expired
+}
+
+model Job {
+  id         String    @id @default(cuid())
+  tool       String
+  status     JobStatus @default(queued)
+  inputPath  String
+  outputPath String?
+  sizeIn     BigInt    @default(0)
+  sizeOut    BigInt?
+  params     Json      @default("{}")
+  error      String?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  logs       AuditLog[]
+
+  // Binary file data for cross-platform storage (Vercel ↔ Railway)
+  inputData  Bytes?
+  outputData Bytes?
+  outputName String?
+
+  @@index([status, expiresAt])
+  @@index([createdAt])
+}
+
+model RateLimitBucket {
+  key         String   @id
+  count       Int      @default(0)
+  windowStart DateTime @default(now())
+
+  @@index([windowStart])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  jobId     String?
+  meta      Json     @default("{}")
+  createdAt DateTime @default(now())
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([jobId])
+}
+
+// Admin: key-value store for all site settings
+model Settings {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// Admin: per-tool configuration (SEO, enabled, sort order)
+model ToolConfig {
+  toolId      String   @id
+  enabled     Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  customTitle String?
+  customDesc  String?
+  metaTitle   String?
+  metaDesc    String?
+  keywords    String?
+  seoContent  String?
+  updatedAt   DateTime @updatedAt
+}
+
+// Analytics: lightweight page view tracking
+model PageView {
+  id        String   @id @default(cuid())
+  toolId    String
+  ip        String?
+  ua        String?
+  createdAt DateTime @default(now())
+
+  @@index([toolId, createdAt])
+  @@index([createdAt])
+}
+
+// Contact messages: user feedback, inquiries, IP and Location tracking
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  ip        String?
+  location  String?
+  createdAt DateTime @default(now())
+}
+
+// Custom Pages: privacy, terms, about, etc. Editable via CKEditor in admin panel
+model Page {
+  slug      String   @id
+  title     String
+  content   String
+  updatedAt DateTime @updatedAt
+}
+
+model MenuItem {
+  id        String     @id @default(cuid())
+  label     String
+  url       String
+  location  String     // "HEADER" or "FOOTER"
+  group     String?    // e.g. "Legal", "Company", "Tools"
+  order     Int        @default(0)
+  newTab    Boolean    @default(false)
+  isActive  Boolean    @default(true)
+  parentId  String?
+  parent    MenuItem?  @relation("MenuHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  MenuItem[] @relation("MenuHierarchy")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}

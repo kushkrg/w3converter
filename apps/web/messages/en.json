@@ -1,0 +1,67 @@
+{
+  "nav": {
+    "home": "Home",
+    "tools": "All Tools",
+    "about": "About",
+    "privacy": "Privacy",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "All-in-One PDF Tools",
+    "subtitle": "Merge, split, compress, convert, protect, and more — free online PDF tools with no registration required.",
+    "cta": "Browse All Tools"
+  },
+  "categories": {
+    "organize": "PDF Organization",
+    "optimize": "Optimization",
+    "convert": "Conversions",
+    "security": "Security"
+  },
+  "tools": {
+    "merge-pdf": { "title": "Merge PDF", "desc": "Combine multiple PDF files into one document." },
+    "split-pdf": { "title": "Split PDF", "desc": "Split a PDF into multiple files by page range." },
+    "rotate-pdf": { "title": "Rotate PDF", "desc": "Rotate pages in a PDF file by 90, 180 or 270 degrees." },
+    "delete-pages": { "title": "Delete Pages", "desc": "Remove selected pages from a PDF file." },
+    "organize-pdf": { "title": "Organize PDF", "desc": "Reorder pages in a PDF with drag-and-drop." },
+    "extract-pages": { "title": "Extract Pages", "desc": "Pull selected pages into a new PDF." },
+    "repair-pdf": { "title": "Repair PDF", "desc": "Recover and repair a damaged PDF file." },
+    "compress-pdf": { "title": "Compress PDF", "desc": "Reduce PDF file size while preserving quality." },
+    "grayscale-pdf": { "title": "Grayscale PDF", "desc": "Convert a color PDF to black and white." },
+    "watermark-pdf": { "title": "Add Watermark to PDF", "desc": "Stamp text, logo, or diagonal watermarks on every page of your PDF with full control over opacity, size, and placement." },
+    "jpg-to-pdf": { "title": "JPG to PDF", "desc": "Convert JPG images to PDF format." },
+    "png-to-pdf": { "title": "PNG to PDF", "desc": "Convert PNG images to PDF format." },
+    "bmp-to-pdf": { "title": "BMP to PDF", "desc": "Convert BMP images to PDF format." },
+    "tiff-to-pdf": { "title": "TIFF to PDF", "desc": "Convert TIFF images to PDF format." },
+    "pdf-to-jpg": { "title": "PDF to JPG", "desc": "Convert PDF pages to JPG images." },
+    "pdf-to-png": { "title": "PDF to PNG", "desc": "Convert PDF pages to PNG images." },
+    "pdf-to-bmp": { "title": "PDF to BMP", "desc": "Convert PDF pages to BMP images." },
+    "pdf-to-tiff": { "title": "PDF to TIFF", "desc": "Convert PDF pages to TIFF images." },
+    "word-to-pdf": { "title": "Word to PDF", "desc": "Convert Word documents (DOC/DOCX) to PDF." },
+    "pdf-to-word": { "title": "PDF to Word", "desc": "Convert PDF files to editable Word documents." },
+    "ppt-to-pdf": { "title": "PPT to PDF", "desc": "Convert PowerPoint presentations to PDF." },
+    "pdf-to-ppt": { "title": "PDF to PPT", "desc": "Convert PDF files to PowerPoint presentations." },
+    "excel-to-pdf": { "title": "Excel to PDF", "desc": "Convert Excel spreadsheets to PDF format." },
+    "txt-to-pdf": { "title": "TXT to PDF", "desc": "Convert plain text files to PDF." },
+    "pdf-to-txt": { "title": "PDF to TXT", "desc": "Extract text content from a PDF file." },
+    "pdf-to-zip": { "title": "PDF to ZIP", "desc": "Bundle PDF output files into a ZIP archive." },
+    "invoice-pdf": { "title": "Invoice Generator", "desc": "Create professional invoices as PDF — add line items, taxes, discounts, logo, and custom color themes." },
+    "protect-pdf": { "title": "Protect PDF", "desc": "Add password protection to your PDF file." },
+    "unlock-pdf": { "title": "Unlock PDF", "desc": "Remove password protection from a PDF file." },
+    "signature-pdf": { "title": "Sign PDF", "desc": "Add a handwritten, typed, or image signature to any page of your PDF with custom placement and signer details." }
+  },
+  "upload": {
+    "dropzone": "Drop your files here or click to browse",
+    "maxSize": "Maximum file size: {size}MB",
+    "processing": "Processing...",
+    "download": "Download",
+    "uploadAnother": "Process another file",
+    "error": "Something went wrong. Please try again."
+  },
+  "footer": {
+    "tagline": "Fast, private, and free PDF tools — no registration required.",
+    "filesDeleted": "All files are automatically deleted after 1 hour.",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}
