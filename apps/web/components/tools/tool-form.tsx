@@ -109,7 +109,7 @@ export function ToolForm({ toolId }: ToolFormProps) {
   }
 
   if (jobId) {
-    return <JobStatus jobId={jobId} onReset={reset} />;
+    return <JobStatus jobId={jobId} toolId={toolId} onReset={reset} />;
   }
 
   return (
