@@ -163,26 +163,28 @@ export default async function ToolPage({
     <>
       <Header />
       <main className="flex-1">
-        <div className={cn("relative overflow-hidden bg-linear-to-b border-b border-border/40 py-10 px-4", colors.heroBg)}>
+        {/* Streamlined Modern Hero Banner */}
+        <div className={cn("relative overflow-hidden bg-linear-to-b border-b border-border/30 py-6 px-4", colors.heroBg)}>
           <div className={cn("absolute -top-20 right-0 w-72 h-72 rounded-full blur-3xl -z-10", colors.heroBlob)} />
           <div className="container mx-auto max-w-3xl">
-            <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-5">
+            <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
               <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
               <ChevronRight className="h-3 w-3" />
               <Link href="/tools" className="hover:text-foreground transition-colors">Tools</Link>
               <ChevronRight className="h-3 w-3" />
               <span className="text-foreground font-medium">{data.title}</span>
             </nav>
-            <h1 className="text-3xl font-extrabold tracking-tight mb-2">{data.title}</h1>
-            <p className="text-muted-foreground">{data.desc}</p>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground mb-1.5">{data.title}</h1>
+            <p className="text-xs md:text-sm text-muted-foreground/90 max-w-2xl leading-relaxed">{data.desc}</p>
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-10 max-w-3xl">
+        {/* Optimized Content Container brought above-the-fold */}
+        <div className="container mx-auto px-4 py-6 max-w-3xl">
           {/* Ad: Above Tool Form */}
-          <AdSlot slotKey="ads.toolPageTop" adFormat="horizontal" className="mb-6" />
+          <AdSlot slotKey="ads.toolPageTop" adFormat="horizontal" className="mb-5" />
 
-          <div className="rounded-2xl border bg-card shadow-sm p-7">
+          <div className="rounded-2xl border bg-card shadow-sm p-6">
             <ToolForm toolId={tool.id as ToolId} recaptchaSiteKey={recaptchaSiteKey} />
           </div>
 
