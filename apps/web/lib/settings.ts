@@ -31,19 +31,31 @@ export const SETTING_DEFAULTS: Record<string, string> = {
 
 export const getSettings = unstable_cache(
   async (keys: string[]): Promise<Record<string, string>> => {
-    const rows = await prisma.settings.findMany({ where: { key: { in: keys } } });
-    const map  = Object.fromEntries(rows.map((r) => [r.key, r.value]));
-    return Object.fromEntries(
-      keys.map((k) => [k, map[k] ?? SETTING_DEFAULTS[k] ?? ""])
-    );
+    try {
+      const rows = await prisma.settings.findMany({ where: { key: { in: keys } } });
+      const map  = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+      return Object.fromEntries(
+        keys.map((k) => [k, map[k] ?? SETTING_DEFAULTS[k] ?? ""])
+      );
+    } catch {
+      // During first deploy the Settings table may not exist yet.
+      // Return defaults so `next build` static generation succeeds.
+      return Object.fromEntries(
+        keys.map((k) => [k, SETTING_DEFAULTS[k] ?? ""])
+      );
+    }
   },
   ["settings"],
   { revalidate: 60, tags: ["settings"] }
 );
 
 export async function getSetting(key: string): Promise<string> {
-  const row = await prisma.settings.findUnique({ where: { key } });
-  return row?.value ?? SETTING_DEFAULTS[key] ?? "";
+  try {
+    const row = await prisma.settings.findUnique({ where: { key } });
+    return row?.value ?? SETTING_DEFAULTS[key] ?? "";
+  } catch {
+    return SETTING_DEFAULTS[key] ?? "";
+  }
 }
 
 export async function upsertSettings(entries: Record<string, string>): Promise<void> {

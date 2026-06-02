@@ -6,10 +6,15 @@ export async function Header() {
   const s = await getSettings(["site.name", "site.logoUrl"]);
 
   // Fetch all active HEADER navigation items ordered by order rank
-  const items = await prisma.menuItem.findMany({
-    where: { location: "HEADER", isActive: true },
-    orderBy: { order: "asc" },
-  });
+  let items: Awaited<ReturnType<typeof prisma.menuItem.findMany>> = [];
+  try {
+    items = await prisma.menuItem.findMany({
+      where: { location: "HEADER", isActive: true },
+      orderBy: { order: "asc" },
+    });
+  } catch {
+    // Table may not exist during first deploy build
+  }
 
   // Build hierarchal structure for parent dropdown menus
   const parentItems = items.filter((item) => item.parentId === null);

@@ -12,7 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default async function TermsPage() {
-  const pageData = await prisma.page.findUnique({ where: { slug: "terms" } });
+  let pageData: Awaited<ReturnType<typeof prisma.page.findUnique>> = null;
+  try {
+    pageData = await prisma.page.findUnique({ where: { slug: "terms" } });
+  } catch {
+    // Table may not exist during first deploy build
+  }
   const content = pageData?.content || DEFAULT_PAGES.terms.content;
   const title = pageData?.title || "Terms of Service";
   const updatedAt = pageData?.updatedAt || new Date("2026-05-26");

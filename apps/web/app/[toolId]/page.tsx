@@ -30,17 +30,26 @@ export async function generateMetadata({
   const { toolId } = await params;
   const tool = TOOLS.find((t) => t.id === toolId);
   if (!tool) {
-    const pageData = await prisma.page.findUnique({ where: { slug: toolId } });
-    if (pageData) {
-      return {
-        title: pageData.title,
-        description: `${pageData.title} on w3converter`,
-      };
+    try {
+      const pageData = await prisma.page.findUnique({ where: { slug: toolId } });
+      if (pageData) {
+        return {
+          title: pageData.title,
+          description: `${pageData.title} on w3converter`,
+        };
+      }
+    } catch {
+      // Table may not exist during first deploy build
     }
     return {};
   }
   const data = (messages.tools as Record<string, { title: string; desc: string }>)[toolId];
-  const cfg  = await prisma.toolConfig.findUnique({ where: { toolId } });
+  let cfg: Awaited<ReturnType<typeof prisma.toolConfig.findUnique>> = null;
+  try {
+    cfg = await prisma.toolConfig.findUnique({ where: { toolId } });
+  } catch {
+    // Table may not exist during first deploy build
+  }
   const defaultSeo = DEFAULT_SEO[toolId];
   return {
     title:       cfg?.metaTitle  || defaultSeo?.metaTitle || data?.title || tool.label,
@@ -86,7 +95,12 @@ export default async function ToolPage({
   const tool = TOOLS.find((t) => t.id === toolId);
   
   if (!tool) {
-    const pageData = await prisma.page.findUnique({ where: { slug: toolId } });
+    let pageData: Awaited<ReturnType<typeof prisma.page.findUnique>> = null;
+    try {
+      pageData = await prisma.page.findUnique({ where: { slug: toolId } });
+    } catch {
+      // Table may not exist during first deploy build
+    }
     if (!pageData) notFound();
 
     return (
@@ -118,7 +132,13 @@ export default async function ToolPage({
     );
   }
 
-  const cfg     = await prisma.toolConfig.findUnique({ where: { toolId } });
+  let cfgPage: Awaited<ReturnType<typeof prisma.toolConfig.findUnique>> = null;
+  try {
+    cfgPage = await prisma.toolConfig.findUnique({ where: { toolId } });
+  } catch {
+    // Table may not exist during first deploy build
+  }
+  const cfg = cfgPage;
   if (cfg && !cfg.enabled) notFound();
 
   const allData = messages.tools as Record<string, { title: string; desc: string }>;

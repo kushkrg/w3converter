@@ -15,10 +15,20 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [configs, s] = await Promise.all([
-    prisma.toolConfig.findMany({ orderBy: { sortOrder: "asc" } }),
-    getSettings(["home.heroTitle", "home.heroDesc"]),
-  ]);
+  let configs: Awaited<ReturnType<typeof prisma.toolConfig.findMany>> = [];
+  let s: Record<string, string> = {};
+  try {
+    [configs, s] = await Promise.all([
+      prisma.toolConfig.findMany({ orderBy: { sortOrder: "asc" } }),
+      getSettings(["home.heroTitle", "home.heroDesc"]),
+    ]);
+  } catch {
+    // Tables may not exist during first deploy build — use defaults
+    s = {
+      "home.heroTitle": "Every tool you need to work with PDFs in one place",
+      "home.heroDesc": "Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use! Merge, split, compress, convert, rotate, unlock and protect PDFs with just a few clicks.",
+    };
+  }
 
   const configMap = Object.fromEntries(configs.map((c) => [c.toolId, c]));
 

@@ -12,7 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default async function DisclaimerPage() {
-  const pageData = await prisma.page.findUnique({ where: { slug: "disclaimer" } });
+  let pageData: Awaited<ReturnType<typeof prisma.page.findUnique>> = null;
+  try {
+    pageData = await prisma.page.findUnique({ where: { slug: "disclaimer" } });
+  } catch {
+    // Table may not exist during first deploy build
+  }
   const content = pageData?.content || DEFAULT_PAGES.disclaimer.content;
   const title = pageData?.title || "Disclaimer";
   const updatedAt = pageData?.updatedAt || new Date("2026-05-26");

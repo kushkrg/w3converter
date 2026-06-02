@@ -11,10 +11,15 @@ export async function Footer() {
   const logoUrl = s["site.logoUrl"] || "";
 
   // Fetch active footer links ordered by priority
-  const footerItems = await prisma.menuItem.findMany({
-    where: { location: "FOOTER", isActive: true },
-    orderBy: { order: "asc" },
-  });
+  let footerItems: Awaited<ReturnType<typeof prisma.menuItem.findMany>> = [];
+  try {
+    footerItems = await prisma.menuItem.findMany({
+      where: { location: "FOOTER", isActive: true },
+      orderBy: { order: "asc" },
+    });
+  } catch {
+    // Table may not exist during first deploy build
+  }
 
   // Group footer links by custom column header categories
   const footerGroups: Record<string, typeof footerItems> = {};

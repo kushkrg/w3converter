@@ -12,7 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default async function PrivacyPage() {
-  const pageData = await prisma.page.findUnique({ where: { slug: "privacy" } });
+  let pageData: Awaited<ReturnType<typeof prisma.page.findUnique>> = null;
+  try {
+    pageData = await prisma.page.findUnique({ where: { slug: "privacy" } });
+  } catch {
+    // Table may not exist during first deploy build
+  }
   const content = pageData?.content || DEFAULT_PAGES.privacy.content;
   const title = pageData?.title || "Privacy Policy";
   const updatedAt = pageData?.updatedAt || new Date("2026-05-26");
