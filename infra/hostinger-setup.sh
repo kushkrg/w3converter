@@ -125,12 +125,12 @@ pnpm --filter web exec prisma generate
 
 # Run database push and seed BEFORE building Next.js pages
 echo -e "${BLUE}Configuring database schema and seeding data...${NC}"
-pnpm --filter web db:push
-node apps/web/prisma/seed-seo.js
+DATABASE_URL="postgresql://kush:${DB_PASSWORD}@localhost:5432/pdftools" DIRECT_URL="postgresql://kush:${DB_PASSWORD}@localhost:5432/pdftools" pnpm --filter web db:push
+DATABASE_URL="postgresql://kush:${DB_PASSWORD}@localhost:5432/pdftools" DIRECT_URL="postgresql://kush:${DB_PASSWORD}@localhost:5432/pdftools" node apps/web/prisma/seed-seo.js
 
 # Now compile Next.js (prerendering will succeed because tables and settings exist!)
 echo -e "${BLUE}Building w3converter monorepo...${NC}"
-pnpm build
+DATABASE_URL="postgresql://kush:${DB_PASSWORD}@localhost:5432/pdftools" DIRECT_URL="postgresql://kush:${DB_PASSWORD}@localhost:5432/pdftools" pnpm build
 
 # Configure Nginx Reverse Proxy
 echo -e "${BLUE}Configuring Nginx Reverse Proxy...${NC}"
