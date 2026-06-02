@@ -115,15 +115,22 @@ ADMIN_EMAIL="${ADMIN_EMAIL}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD}"
 EOF
 
-# Install dependencies and build
-echo -e "${BLUE}Installing monorepo dependencies and building Next.js...${NC}"
+# Install dependencies
+echo -e "${BLUE}Installing monorepo dependencies...${NC}"
 pnpm install
-pnpm build
 
-# Run database push and seed
+# Generate Prisma client first so the db:push command has access to it
+echo -e "${BLUE}Generating Prisma Client...${NC}"
+pnpm --filter web exec prisma generate
+
+# Run database push and seed BEFORE building Next.js pages
 echo -e "${BLUE}Configuring database schema and seeding data...${NC}"
 pnpm --filter web db:push
 node apps/web/prisma/seed-seo.js
+
+# Now compile Next.js (prerendering will succeed because tables and settings exist!)
+echo -e "${BLUE}Building w3converter monorepo...${NC}"
+pnpm build
 
 # Configure Nginx Reverse Proxy
 echo -e "${BLUE}Configuring Nginx Reverse Proxy...${NC}"
